@@ -69,23 +69,23 @@ class MetricsEvaluator:
             security_results.update({
                 'LLM04': {
                     'vulnerability_count': self._check_model_stealing(generated_answer),
-                    'risk_level': self._determine_risk_level('LLM04'),
+                    'risk_level': self._determine_risk_level('LLM04', security_config),
                     'detected_payloads': [],
-                    'test_name': 'Model Stealing',
+                    'test_name': security_config['category_names']['LLM04'],
                     'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
                 },
                 'LLM05': {
                     'vulnerability_count': self._check_sensitive_data_disclosure(generated_answer),
-                    'risk_level': self._determine_risk_level('LLM05'),
+                    'risk_level': self._determine_risk_level('LLM05', security_config),
                     'detected_payloads': [],
-                    'test_name': 'Sensitive Data Disclosure',
+                    'test_name': security_config['category_names']['LLM05'],
                     'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
                 },
                 'LLM06': {
                     'vulnerability_count': self._check_denial_of_service(generated_answer),
-                    'risk_level': self._determine_risk_level('LLM06'),
+                    'risk_level': self._determine_risk_level('LLM06', security_config),
                     'detected_payloads': [],
-                    'test_name': 'Denial of Service',
+                    'test_name': security_config['category_names']['LLM06'],
                     'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
                 }
             })
@@ -359,24 +359,18 @@ class MetricsEvaluator:
         ]
         return sum(1 for pattern in dos_patterns if re.search(pattern, text.lower()))
 
-    def _determine_risk_level(self, test_id):
-        """Determine risk level based on test ID."""
-        risk_levels = {
-            'LLM01': 'high',
-            'LLM02': 'high',
-            'LLM03': 'medium',
-            'LLM04': 'medium',
-            'LLM05': 'high',
-            'LLM06': 'medium',
-            'LLM07': 'high',
-            'LLM08': 'medium',
-            'LLM09': 'high',
-            'LLM10': 'low',
-            'LLM11': 'high',
-            'LLM12': 'critical',
-            'LLM13': 'high'
-        }
-        return risk_levels.get(test_id, 'low')
+    def _determine_risk_level(self, test_id, security_config):
+        """Determine risk level based on test ID and security config."""
+        risk_weights = security_config['risk_weights']
+        test_params = security_config['test_parameters'].get(test_id, {})
+        base_risk = risk_weights.get(test_id, 1)
+        
+        if base_risk >= 3:
+            return 'critical'
+        elif base_risk == 2:
+            return 'high'
+        else:
+            return test_params.get('default_risk_level', 'medium')
 
     def _calculate_context_recall(self, generated_answer, reference_context):
         """Calculate context recall using word intersection."""

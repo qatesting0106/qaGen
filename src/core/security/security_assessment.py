@@ -10,57 +10,12 @@ class SecurityAssessment:
     """
     
     def __init__(self):
-        self.vulnerability_categories = {
-            'input_validation': ['LLM01', 'LLM08', 'SQL_INJ', 'CMD_INJ', 'TPL_INJ'],  # Prompt Injection, Model Manipulation, SQL/Command/Template Injection
-            'output_handling': ['LLM02', 'XSS_INJ'],  # Insecure Output Handling, XSS
-            'data_protection': ['LLM05', 'LLM07', 'DATA_PROT'],  # Information Disclosure, Data Extraction, Data Protection
-            'model_security': ['LLM03', 'LLM04', 'LLM09', 'LLM11'],  # Poisoning, Stealing, Supply Chain, Embeddings
-            'resource_management': ['LLM06', 'LLM13'],  # DoS, Consumption
-            'content_quality': ['LLM12'],  # Misinformation
-            'agency_control': ['LLM10']  # Excessive Agency
-        }
+        from .security_config import SECURITY_CONFIG
+        self.security_config = SECURITY_CONFIG
         
-        self.category_descriptions = {
-            'LLM01': 'Prompt Injection - Malicious inputs that manipulate model behavior',
-            'LLM02': 'Insecure Output Handling - Inadequate filtering of harmful outputs',
-            'LLM03': 'Training Data Poisoning - Compromised training data affecting model',
-            'LLM04': 'Model Stealing - Unauthorized extraction of model capabilities',
-            'LLM05': 'Sensitive Information Disclosure - Leakage of private data',
-            'LLM06': 'Denial of Service - Resource exhaustion attacks',
-            'LLM07': 'Training Data Extraction - Unauthorized access to training data',
-            'LLM08': 'Model Manipulation - Unauthorized changes to model behavior',
-            'LLM09': 'Supply Chain Attacks - Compromised model dependencies',
-            'LLM10': 'Excessive Agency - Uncontrolled model autonomy',
-            'LLM11': 'Vector Embedding Weaknesses - Vulnerabilities in embeddings',
-            'LLM12': 'Misinformation Generation - Creation of false content',
-            'LLM13': 'Unbounded Consumption - Excessive resource usage',
-            'SQL_INJ': 'SQL Injection - Malicious SQL queries that manipulate database operations',
-            'XSS_INJ': 'Cross-Site Scripting - Injection of malicious client-side scripts',
-            'CMD_INJ': 'Command Injection - Unauthorized system command execution',
-            'TPL_INJ': 'Template Injection - Exploitation of template rendering engines',
-            'DATA_PROT': 'Data Protection - Handling of sensitive customer information'
-        }
-        
-        self.risk_weights = {
-            'LLM01': 0.9,  # Prompt Injection
-            'LLM02': 0.9,  # Insecure Output Handling
-            'LLM03': 0.7,  # Training Data Poisoning
-            'LLM04': 0.6,  # Model Stealing
-            'LLM05': 0.8,  # Sensitive Information Disclosure
-            'LLM06': 0.6,  # Denial of Service
-            'LLM07': 0.7,  # Training Data Extraction
-            'LLM08': 0.7,  # Model Manipulation
-            'LLM09': 0.8,  # Supply Chain Attacks
-            'LLM10': 0.5,  # Excessive Agency
-            'LLM11': 0.7,  # Vector Embedding Weaknesses
-            'LLM12': 0.8,  # Misinformation Generation
-            'LLM13': 0.6,  # Unbounded Consumption
-            'SQL_INJ': 0.9, # SQL Injection
-            'XSS_INJ': 0.9, # Cross-Site Scripting
-            'CMD_INJ': 0.9, # Command Injection
-            'TPL_INJ': 0.8, # Template Injection
-            'DATA_PROT': 0.8 # Data Protection
-        }
+        self.vulnerability_categories = self.security_config['test_parameters']
+        self.category_descriptions = self.security_config['category_descriptions']
+        self.risk_weights = self.security_config['risk_weights']
     
     def assess_security(self, security_results: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -239,6 +194,22 @@ class SecurityAssessment:
                     'implementation_steps': self._get_implementation_steps(category)
                 })
         
+        # Add general security recommendations for low-risk scenarios
+        if not recommendations:
+            recommendations.append({
+                'category': 'GENERAL',
+                'name': 'Proactive Security Measures',
+                'priority': 'low',
+                'recommendation': 'Implement proactive security monitoring and regular audits',
+                'details': 'Even with low detected risks, maintain security through:',
+                'implementation_steps': [
+                    'Establish continuous security monitoring',
+                    'Conduct quarterly penetration testing',
+                    'Maintain incident response playbooks',
+                    'Provide annual security awareness training'
+                ]
+            })
+
         return recommendations
     
     def _generate_category_details(self) -> Dict[str, Dict[str, Any]]:
@@ -246,7 +217,7 @@ class SecurityAssessment:
         Generate detailed information for all security categories.
         """
         categories = {}
-        for category_id, description in self.category_descriptions.items():
+        for category_id in self.security_config['category_names'].keys():
             categories[category_id] = {
                 'name': description.split(' - ')[0],
                 'description': description.split(' - ')[1],

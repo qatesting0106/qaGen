@@ -131,6 +131,14 @@ class OWASPSecurityTests:
             vulnerability_count = 0
             detected_payloads = []
             is_high_priority = category in ['XSS_INJ', 'SQL_INJ', 'CMD_INJ']
+            results[category] = {
+                'vulnerability_count': 0,
+                'risk_level': 'low',
+                'detected_payloads': [],
+                'test_name': test_case['name'],
+                'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                'is_high_priority': is_high_priority
+            }
 
             for payload in test_case['payloads']:
                 for response in responses:

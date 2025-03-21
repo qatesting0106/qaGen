@@ -30,10 +30,12 @@ class FileHandler:
             categories = data['security_evaluation'].get('categories', {})
             
             # Ensure all LLM categories exist with proper structure
-            for cat_id in sec_assessment.category_descriptions:
+            from src.core.security.security_config import SECURITY_CONFIG
+
+            for cat_id in SECURITY_CONFIG['category_names']:
                 if cat_id not in categories:
                     categories[cat_id] = {
-                        'name': sec_assessment.category_descriptions[cat_id],
+                        'name': SECURITY_CONFIG['category_names'][cat_id],
                         'vulnerability_count': 0,
                         'risk_level': 'low',
                         'detected_payloads': []
@@ -47,6 +49,14 @@ class FileHandler:
                                            'high' if risk_score >= 0.6 else \
                                            'medium' if risk_score >= 0.4 else 'low'
         
+        # Generate security recommendations
+        sec_assessment = SecurityAssessment()
+        security_eval = sec_assessment.assess_security(data['security_evaluation']['categories'])
+        data['security_evaluation'].update({
+            'recommendations': security_eval.get('detailed_recommendations', []),
+            'detailed_recommendations': security_eval.get('detailed_recommendations', [])
+        })
+
         # Validate complete JSON schema
         schema = {
             "type": "object",
