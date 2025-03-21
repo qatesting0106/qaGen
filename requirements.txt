@@ -1,0 +1,13 @@
+streamlit
+dotenv
+giskard
+giskard[llm]
+langchain
+langchain_community
+langchain_groq
+langchain-mistralai==0.2.8
+promptfoo
+IPython
+plotly
+pytest
+pytest-cov
