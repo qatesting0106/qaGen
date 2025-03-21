@@ -36,7 +36,7 @@ dashboard = DashboardComponents()
 security_report_viewer = SecurityReportViewer(OUTPUT_DIR)
 
 def main():
-    st.title("RAG System Evaluation Dashboard")
+    # st.title("QA Dashboard")
 
     # Load CSS
     css_path = os.path.abspath("style.css")
