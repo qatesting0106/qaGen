@@ -2,7 +2,7 @@ streamlit
 dotenv
 giskard
 giskard[llm]
-langchain
+langchain==0.3.21
 langchain_community
 langchain_groq
 langchain-mistralai==0.2.8
