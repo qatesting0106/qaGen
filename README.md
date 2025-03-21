@@ -1,4 +1,4 @@
-# RAG System Evaluation Framework
+# Framework
 
 This project provides a framework for evaluating RAG (Retrieval-Augmented Generation) systems using various metrics and visualizations.
 
