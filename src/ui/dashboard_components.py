@@ -15,7 +15,8 @@ class DashboardComponents:
             generate_test = st.button("Generate Test Set", key="generate_test", help="Create test questions from the document")
             generate_answers = st.button("Generate Answers", key="generate_answers", help="Generate answers for the test questions")
             calculate_metrics = st.button("Calculate Metrics", key="calculate_metrics", help="Evaluate the performance metrics")
-            evaluate_security = st.button("Security Evaluation", key="evaluate_security", help="Comprehensive security assessment including OWASP LLM guidelines and red team findings")
+            evaluate_security = st.button("Evaluate Security", key="evaluate_security", help="Evaluate security aspects of the system")
+            
         # Add number input for test questions in main content area
         num_questions = st.number_input("Number of test questions", min_value=1, max_value=10, value=1, step=1, help="Specify how many test questions to generate")
         return generate_test, generate_answers, calculate_metrics, evaluate_security, num_questions
@@ -48,7 +49,7 @@ class DashboardComponents:
             'Context Metrics': ['context_precision', 'context_recall', 'context_f1'],
             'Answer Quality': ['answer_relevance', 'answer_completeness', 'answer_consistency'],
             'Similarity Metrics': ['cosine_similarity', 'faithfulness'],
-            'Security Metrics': ['prompt_injection_risk', 'info_disclosure_risk', 'output_handling_risk', 'agency_risk', 'prompt_leakage_risk'],
+            
             'OWASP Top 10': ['prompt_injection_risk', 'info_disclosure_risk', 'output_handling_risk', 'agency_risk', 'prompt_leakage_risk']
         }
         
@@ -101,7 +102,7 @@ class DashboardComponents:
         st.markdown("Visual comparison of different evaluation metrics")
         
         # Filter out non-numeric columns and ensure only numeric data is used
-        non_metric_columns = ['question', 'generated_answer', 'reference_context', 'security_evaluation']
+        non_metric_columns = ['question', 'generated_answer', 'reference_context']
         
         # First filter columns that are not in the exclusion list
         potential_numeric_columns = [col for col in metrics_df.columns if col not in non_metric_columns]
@@ -187,7 +188,7 @@ class DashboardComponents:
         st.markdown("Inter-metric relationships and dependencies")
         
         # Filter out non-numeric columns and complex data types
-        non_metric_columns = ['question', 'generated_answer', 'reference_context', 'security_evaluation']
+        non_metric_columns = ['question', 'generated_answer', 'reference_context']
         
         # Create a clean dataframe with only numeric values
         numeric_data = {}

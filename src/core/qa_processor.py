@@ -46,8 +46,17 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 # Import moved to top of file
 from langchain_groq import ChatGroq
-from giskard.rag import KnowledgeBase, AgentAnswer
+from giskard.rag import KnowledgeBase
+from dataclasses import dataclass
+from typing import List, Dict, Any, Optional
 from langchain.schema import Document
+
+@dataclass
+class AgentAnswer:
+    message: str
+    documents: Optional[List[Document]] = None
+    security_assessment: Optional[Dict[str, Any]] = None
+from src.core.security_evaluator import SecurityEvaluator
 
 class QAProcessor:
     def __init__(self, mistral_api_key: str, groq_api_key: str):
@@ -58,6 +67,7 @@ class QAProcessor:
         self.vector_store = None
         self.llm_model = None
         self.qa_chain = None
+        self.security_evaluator = SecurityEvaluator('output')
 
     def load_documents(self, file_path) -> List:
         """Load and split documents from the given file path or uploaded file."""
@@ -134,7 +144,11 @@ Your answer:
             agent_output = self.qa_chain.invoke({"query": question})["result"]
             answer = str(agent_output)
             documents = getattr(agent_output, 'source_nodes', [])
-            return AgentAnswer(message=answer, documents=documents)
+            
+            # Evaluate security risks
+            security_assessment = self.security_evaluator.evaluate_security_risks(question, answer)
+            
+            return AgentAnswer(message=answer, documents=documents, security_assessment=security_assessment)
         except Exception as e:
             raise Exception(f"Error generating answer: {str(e)}")
 

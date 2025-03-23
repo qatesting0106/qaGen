@@ -11,8 +11,6 @@ from src.core.metrics_evaluator import MetricsEvaluator
 from src.utils.file_handler import FileHandler
 from src.utils.data_processor import DataProcessor
 from src.ui.dashboard_components import DashboardComponents
-from src.ui.security_report_viewer import SecurityReportViewer
-
 # Load environment variables and configure settings
 load_dotenv()
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
@@ -23,7 +21,7 @@ giskard.llm.set_llm_model("mistral/mistral-large-latest")
 giskard.llm.set_embedding_model("mistral/mistral-embed")
 
 # Constants
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "genai_output")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "genai_output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 DATA_DIR = "data"
 
@@ -33,7 +31,7 @@ qa_processor = QAProcessor(MISTRAL_API_KEY, GROQ_API_KEY)
 qa_processor.initialize_embeddings()
 metrics_evaluator = MetricsEvaluator(OUTPUT_DIR, qa_processor.embeddings)
 dashboard = DashboardComponents()
-security_report_viewer = SecurityReportViewer(OUTPUT_DIR)
+
 
 def main():
     # st.title("QA Dashboard")
@@ -174,7 +172,6 @@ def main():
 
             # Calculate and display metrics
             if calculate_metrics:
-                print("in *****")
                 try:
                     # Find the latest metrics results file
                     metrics_files = [f for f in os.listdir(OUTPUT_DIR) if f.startswith('metrics_results_')]
@@ -186,7 +183,6 @@ def main():
                     latest_metrics_file = sorted(metrics_files, reverse=True)[0]
                     metrics_file_path = os.path.join(OUTPUT_DIR, latest_metrics_file)
                     metrics_data = file_handler.load_json(metrics_file_path)
-                    print("***** **** ** *** metrics_data :",metrics_data)
                     if metrics_data:
                         metrics_df = DataProcessor.process_metrics_data(metrics_data)
                         dashboard.display_metrics_summary(metrics_df)
@@ -197,15 +193,50 @@ def main():
                         dashboard.display_error_message("Please generate answers first")
                 except Exception as e:
                     dashboard.display_error_message(f"Error calculating metrics: {str(e)}")
-                    
-            # Display comprehensive security evaluation
+            
+            # Evaluate security risks
             if evaluate_security:
                 try:
-                    security_report_viewer.display_security_report()
+                    # Get latest testset file
+                    output_files = [f for f in os.listdir(OUTPUT_DIR) if f.startswith('testset_')]
+                    if not output_files:
+                        dashboard.display_error_message("No testset files found. Please generate a testset first.")
+                        return
+                    
+                    latest_file = sorted(output_files, reverse=True)[0]
+                    testset_path = os.path.join(OUTPUT_DIR, latest_file)
+                    testset_data = file_handler.load_jsonl(testset_path)
+                    
+                    if not testset_data:
+                        dashboard.display_error_message("Testset is empty. Please generate a new testset.")
+                        return
+                    
+                    st.subheader("Security Risk Assessment")
+                    for idx, question_data in enumerate(testset_data):
+                        security_assessment = qa_processor.security_evaluator.evaluate_security_risks(
+                            question_data['question'],
+                            question_data.get('reference_answer', '')
+                        )
+                        
+                        st.markdown(f"### Question {idx + 1}")
+                        st.markdown(f"**Question:** {question_data['question']}")
+                        st.markdown(f"**Risk Score:** {security_assessment['risk_score']:.2f}/10.0")
+                        st.markdown(f"**Severity Level:** {security_assessment['severity_level'].upper()}")
+                        
+                        if security_assessment['risks']:
+                            st.markdown("**Detected Risks:**")
+                            for risk in security_assessment['risks']:
+                                st.markdown(f"- **{risk['category']}** ({risk['severity'].upper()})")
+                                st.markdown(f"  - Location: {risk['location']}")
+                                st.markdown(f"  - Description: {risk['description']}")
+                        else:
+                            st.markdown("**No security risks detected**")
+                        st.markdown("---")
+                        
                     dashboard.display_success_message("Security evaluation completed successfully!")
                 except Exception as e:
-                    dashboard.display_error_message(f"Error during security evaluation: {str(e)}")
-
+                    dashboard.display_error_message(f"Error evaluating security: {str(e)}")
+            
         except Exception as e:
             dashboard.display_error_message(f"Error processing file: {str(e)}")
 
