@@ -67,7 +67,7 @@ class QAProcessor:
         self.vector_store = None
         self.llm_model = None
         self.qa_chain = None
-        self.security_evaluator = SecurityEvaluator('output')
+        self.security_evaluator = SecurityEvaluator()
 
     def load_documents(self, file_path) -> List:
         """Load and split documents from the given file path or uploaded file."""

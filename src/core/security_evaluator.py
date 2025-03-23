@@ -4,22 +4,32 @@ from typing import Dict, Any, List
 from datetime import datetime
 
 class SecurityEvaluator:
-    def __init__(self, output_dir: str):
-        self.output_dir = output_dir
-        self.security_data_file = os.path.join(output_dir, 'security_assessments.json')
-        self._initialize_storage()
+    def __init__(self):
+        # Define output directory path outside the project directory
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        parent_dir = os.path.dirname(project_dir)
+        self.output_dir = os.path.abspath(os.path.join(parent_dir, "genai_security_assessments"))
+        self.security_data_file = None
 
     def _initialize_storage(self) -> None:
-        """Initialize the security assessments storage file if it doesn't exist."""
+        """Initialize the security assessments storage file."""
         # Create output directory if it doesn't exist
         os.makedirs(self.output_dir, exist_ok=True)
         
-        if not os.path.exists(self.security_data_file):
-            with open(self.security_data_file, 'w') as f:
-                json.dump([], f)
+        # Generate new file path with current timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.security_data_file = os.path.join(self.output_dir, f'security_assessments_{timestamp}.json')
+        
+        # Create the file with empty array
+        with open(self.security_data_file, 'w') as f:
+            json.dump([], f)
 
     def evaluate_security_risks(self, question: str, answer: str) -> Dict[str, Any]:
         """Evaluate security risks in the question and answer."""
+        # Initialize storage if not already done
+        if self.security_data_file is None:
+            self._initialize_storage()
+            
         # Analyze potential security risks
         risks = self._analyze_security_risks(question, answer)
         
