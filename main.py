@@ -10,6 +10,7 @@ from src.core.qa_processor import QAProcessor
 from src.core.metrics_evaluator import MetricsEvaluator
 from src.utils.file_handler import FileHandler
 from src.utils.data_processor import DataProcessor
+from src.utils.report_generator import ReportGenerator
 from src.ui.dashboard_components import DashboardComponents
 # Load environment variables and configure settings
 load_dotenv()
@@ -30,6 +31,7 @@ file_handler = FileHandler(OUTPUT_DIR)
 qa_processor = QAProcessor(MISTRAL_API_KEY, GROQ_API_KEY)
 qa_processor.initialize_embeddings()
 metrics_evaluator = MetricsEvaluator(OUTPUT_DIR, qa_processor.embeddings)
+report_generator = ReportGenerator(OUTPUT_DIR)
 dashboard = DashboardComponents()
 
 
@@ -74,7 +76,7 @@ def main():
                 return
 
     # Display control buttons
-    generate_test, generate_answers, calculate_metrics, evaluate_security, num_questions = dashboard.display_control_buttons()
+    generate_test, generate_answers, calculate_metrics, evaluate_security, download_report, num_questions = dashboard.display_control_buttons()
 
     if uploaded_file:
         try:
@@ -189,8 +191,6 @@ def main():
                         dashboard.plot_metrics_comparison(metrics_df)
                         dashboard.plot_metrics_heatmap(metrics_df)
                         dashboard.display_success_message("Metrics calculated and displayed successfully!")
-                    else:
-                        dashboard.display_error_message("Please generate answers first")
                 except Exception as e:
                     dashboard.display_error_message(f"Error calculating metrics: {str(e)}")
             
@@ -236,7 +236,28 @@ def main():
                     dashboard.display_success_message("Security evaluation completed successfully!")
                 except Exception as e:
                     dashboard.display_error_message(f"Error evaluating security: {str(e)}")
-            
+                    
+                # Handle report generation after security evaluation
+            if download_report:
+                print("Download Report Button Clicked")
+                try:
+                        # Generate and display the report content
+                        html_report = report_generator.generate_report()
+                        print("HTML Report:", html_report)
+                        
+                        if html_report:
+                            st.markdown("### Generated Report Preview")
+                            st.components.v1.html(html_report, height=400, scrolling=True)
+                            
+                            # Display download button for the report
+                            report_generator.display_download_button()
+                            
+                            # Add success message
+                            st.success("Report generated successfully! Click the button above to download.")
+                        else:
+                            dashboard.display_error_message("Failed to generate report content")
+                except Exception as e:
+                    dashboard.display_error_message(f"Error generating report: {str(e)}")
         except Exception as e:
             dashboard.display_error_message(f"Error processing file: {str(e)}")
 

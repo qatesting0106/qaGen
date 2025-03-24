@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Evaluation Report</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #4f46e5;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --gray-color: #64748b;
+            --border-color: #e2e8f0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-meta {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        .summary-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metrics-overview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .metric-card {
+            flex: 1 1 200px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .metric-label {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        .qa-section {
+            margin-top: 2rem;
+        }
+        
+        .qa-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question {
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .answer {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .reference {
+            background-color: #eff6ff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .metrics-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .metric-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background-color: #e2e8f0;
+        }
+        
+        .metric-badge.high {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .metric-badge.medium {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .metric-badge.low {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .security-section {
+            margin-top: 2rem;
+        }
+        
+        .security-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .risk-level {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .risk-level.low {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .risk-level.medium {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .risk-level.high {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .risk-level.critical {
+            background-color: #fecaca;
+            color: #7f1d1d;
+        }
+        
+        .risk-item {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        
+        .charts-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .chart-container {
+            flex: 1 1 45%;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding: 1rem;
+            }
+            
+            .summary-section,
+            .qa-item,
+            .security-item,
+            .chart-container {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>QA Evaluation Report</h1>
+            <p class="report-meta">Generated on: {{timestamp}}</p>
+        </header>
+        
+        <section class="summary-section">
+            <h2>Summary</h2>
+            <p>This report contains the evaluation results for {{num_questions}} questions generated from the document "{{document_name}}".</p>
+            
+            <div class="metrics-overview">
+                <div class="metric-card">
+                    <div class="metric-value">{{avg_cosine_similarity}}</div>
+                    <div class="metric-label">Avg. Cosine Similarity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{avg_faithfulness}}</div>
+                    <div class="metric-label">Avg. Faithfulness</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{avg_context_f1}}</div>
+                    <div class="metric-label">Avg. Context F1</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{avg_answer_relevance}}</div>
+                    <div class="metric-label">Avg. Answer Relevance</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="qa-section">
+            <h2>Questions & Answers</h2>
+            
+            {{#each qa_items}}
+            <div class="qa-item">
+                <div class="question">Q: {{question}}</div>
+                <div class="answer">A: {{generated_answer}}</div>
+                <div class="reference">Reference: {{reference_answer}}</div>
+                
+                <div class="metrics-detail">
+                    <span class="metric-badge {{cosine_similarity_class}}">Similarity: {{cosine_similarity}}</span>
+                    <span class="metric-badge {{faithfulness_class}}">Faithfulness: {{faithfulness}}</span>
+                    <span class="metric-badge {{context_f1_class}}">Context F1: {{context_f1}}</span>
+                    <span class="metric-badge {{answer_relevance_class}}">Relevance: {{answer_relevance}}</span>
+                </div>
+            </div>
+            {{/each}}
+        </section>
+        
+        <section class="security-section">
+            <h2>Security Assessment</h2>
+            
+            {{#each security_items}}
+            <div class="security-item">
+                <div class="question">Q: {{question}}</div>
+                <div class="risk-level {{severity_class}}">Risk Level: {{severity_level}}</div>
+                
+                {{#if risks.length}}
+                <h4>Detected Risks:</h4>
+                {{#each risks}}
+                <div class="risk-item">
+                    <strong>{{category}}</strong> ({{severity}})<br>
+                    <small>Location: {{location}}</small><br>
+                    {{description}}
+                </div>
+                {{/each}}
+                {{else}}
+                <p>No security risks detected.</p>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+        
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Metrics Comparison</h3>
+                <div id="metrics-chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Security Risk Distribution</h3>
+                <div id="security-chart"></div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Generated by QA Dashboard | &copy; {{current_year}}</p>
+        </footer>
+    </div>
+</body>
+</html>

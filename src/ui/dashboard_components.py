@@ -16,10 +16,11 @@ class DashboardComponents:
             generate_answers = st.button("Generate Answers", key="generate_answers", help="Generate answers for the test questions")
             calculate_metrics = st.button("Calculate Metrics", key="calculate_metrics", help="Evaluate the performance metrics")
             evaluate_security = st.button("Evaluate Security", key="evaluate_security", help="Evaluate security aspects of the system")
+            download_report = st.button("Download Report", key="download_report", help="Generate and download a comprehensive HTML report")
             
         # Add number input for test questions in main content area
         num_questions = st.number_input("Number of test questions", min_value=1, max_value=10, value=1, step=1, help="Specify how many test questions to generate")
-        return generate_test, generate_answers, calculate_metrics, evaluate_security, num_questions
+        return generate_test, generate_answers, calculate_metrics, evaluate_security, download_report, num_questions
 
     @staticmethod
     def display_config_controller():
