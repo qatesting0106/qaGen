@@ -6,57 +6,63 @@
 2. [System Architecture](#system-architecture)
 3. [Installation and Setup](#installation-and-setup)
 4. [Core Components](#core-components)
-   - [QA Processor](#qa-processor)
-   - [Metrics Evaluator](#metrics-evaluator)
-   - [Security Assessment](#security-assessment)
 5. [UI Components](#ui-components)
-   - [Dashboard](#dashboard)
-   - [Security Report Viewer](#security-report-viewer)
-6. [Utilities](#utilities)
-   - [Data Processor](#data-processor)
-   - [File Handler](#file-handler)
-7. [Usage Guide](#usage-guide)
-8. [Security Features](#security-features)
-9. [API Reference](#api-reference)
-10. [Troubleshooting](#troubleshooting)
+6. [Advanced Usage](#advanced-usage)
+7. [Security Guidelines](#security-guidelines)
+8. [Performance Optimization](#performance-optimization)
+9. [Troubleshooting](#troubleshooting)
 
 ## Project Overview
 
 This project is a comprehensive framework for evaluating Retrieval-Augmented Generation (RAG) systems using various metrics and visualizations. It provides tools for document processing, question generation, answer generation, and evaluation of both performance and security aspects of the generated answers.
 
-The system integrates with Mistral AI and Groq for embeddings and language model capabilities, and implements OWASP LLM security guidelines for comprehensive security assessment.
+Key Features:
+- Document processing and chunking with configurable parameters
+- Advanced embedding generation using Mistral AI
+- Efficient vector storage using FAISS
+- Answer generation with Groq LLM
+- Comprehensive metrics evaluation
+- Security assessment based on OWASP LLM guidelines
+- Interactive Streamlit dashboard
+- Automated test generation using Giskard
 
 ## System Architecture
 
 The application follows a modular architecture with clear separation of concerns:
 
 ```
-.
-├── data/                  # Input data directory
-├── output/                # Output directory for results
+/genCodeProject
+├── data/                  # Input data and test cases
+│   ├── raw/              # Raw input documents
+│   └── processed/        # Processed and chunked documents
+├── docs/                  # Project documentation
 ├── src/                   # Source code
-│   ├── core/              # Core functionality
-│   │   ├── qa_processor.py       # QA processing logic
-│   │   ├── metrics_evaluator.py  # Metrics calculation
-│   │   └── security/             # Security assessment modules
-│   ├── utils/             # Utility functions
-│   │   ├── data_processor.py     # Data processing utilities
-│   │   └── file_handler.py       # File operations
-│   └── ui/                # UI components
-│       ├── dashboard_components.py    # Dashboard UI elements
-│       └── security_report_viewer.py  # Security report visualization
-├── .env                   # Environment variables
-├── requirements.txt       # Project dependencies
-└── style.css             # Custom styling
+│   ├── core/             # Core functionality
+│   │   ├── qa_processor.py      # QA processing logic
+│   │   ├── metrics_evaluator.py # Metrics calculation
+│   │   └── security/            # Security assessment
+│   │       ├── evaluator.py     # Main security evaluator
+│   │       └── rules/           # Security rules
+│   ├── ui/               # UI components
+│   │   ├── components/   # Reusable UI components
+│   │   └── pages/        # Dashboard pages
+│   └── utils/            # Utility functions
+│       ├── data_processor.py    # Data processing
+│       ├── file_handler.py      # File operations
+│       └── metrics_utils.py     # Metrics utilities
+├── tests/                # Test suite
+├── .env                  # Environment variables
+├── requirements.txt      # Project dependencies
+├── style.css            # Custom styling
+└── main.py              # Application entry point
 ```
-
-The application uses Streamlit for the frontend interface, Langchain for document processing and RAG implementation, and Giskard for test generation and evaluation.
 
 ## Installation and Setup
 
 ### Prerequisites
 
 - Python 3.8 or higher
+- 4GB RAM minimum (8GB recommended)
 - Mistral API key
 - Groq API key
 - Hugging Face token (optional)
@@ -86,6 +92,154 @@ The application uses Streamlit for the frontend interface, Langchain for documen
    MISTRAL_API_KEY=your_mistral_api_key
    GROQ_API_KEY=your_groq_api_key
    HF_TOKEN=your_huggingface_token  # Optional
+   CHUNK_SIZE=1000
+   CHUNK_OVERLAP=200
+   MAX_CONTEXT_LENGTH=2000
+   RISK_THRESHOLD=0.7
+   ```
+
+5. Initialize the application:
+   ```bash
+   python init_app.py  # Creates necessary directories and configs
+   ```
+
+## Core Components
+
+### QA Processor
+
+The QA Processor handles document processing, embedding generation, and answer generation:
+
+1. **Document Processing**
+   - Supports multiple file formats (txt, pdf, docx)
+   - Configurable chunking parameters
+   - Metadata extraction and preservation
+
+2. **Embedding Generation**
+   - Mistral AI integration for high-quality embeddings
+   - Batch processing for efficiency
+   - Caching mechanism for faster retrieval
+
+3. **Answer Generation**
+   - RAG pipeline with Groq LLM
+   - Context-aware answer generation
+   - Confidence score calculation
+
+### Metrics Evaluator
+
+Comprehensive evaluation system with multiple metric types:
+
+1. **Context Metrics**
+   - Precision: Accuracy of retrieved context
+   - Recall: Completeness of context retrieval
+   - F1 Score: Balanced measure of precision and recall
+
+2. **Answer Quality Metrics**
+   - Relevance: Answer alignment with question
+   - Completeness: Coverage of question aspects
+   - Consistency: Agreement with context
+
+3. **Similarity Metrics**
+   - Cosine Similarity: Vector space similarity
+   - Faithfulness: Factual accuracy measurement
+
+### Security Evaluator
+
+Implements OWASP LLM security guidelines:
+
+1. **Prompt Injection Detection**
+   - Pattern-based detection
+   - Behavioral analysis
+   - Risk scoring
+
+2. **Information Disclosure Prevention**
+   - PII detection
+   - Sensitive data filtering
+   - Output sanitization
+
+3. **Agency Risk Assessment**
+   - Autonomy evaluation
+   - Decision impact analysis
+   - Control mechanism verification
+
+## UI Components
+
+### Dashboard
+
+1. **Control Panel**
+   - Document upload interface
+   - Configuration settings
+   - Process control buttons
+
+2. **Visualization Components**
+   - Interactive charts
+   - Metric displays
+   - Security assessment reports
+
+3. **Results Display**
+   - Answer presentation
+   - Context highlighting
+   - Source attribution
+
+## Advanced Usage
+
+### Custom Metrics
+
+Implement custom metrics by extending the MetricsEvaluator class:
+
+```python
+class CustomMetricsEvaluator(MetricsEvaluator):
+    def calculate_custom_metric(self, answer, context):
+        # Implementation
+        return score
+```
+
+### Security Rules
+
+Add custom security rules:
+
+```python
+class CustomSecurityRule(SecurityRule):
+    def evaluate(self, answer, prompt):
+        # Rule implementation
+        return risk_score
+```
+
+### Performance Optimization
+
+1. **Embedding Optimization**
+   - Batch size tuning
+   - Caching strategy
+   - Dimension reduction
+
+2. **Vector Store Tuning**
+   - Index optimization
+   - Search parameter adjustment
+   - Memory management
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Memory Issues**
+   - Reduce chunk size
+   - Enable batch processing
+   - Clear cache periodically
+
+2. **Performance Issues**
+   - Optimize vector store
+   - Adjust batch sizes
+   - Enable caching
+
+3. **API Rate Limits**
+   - Implement request throttling
+   - Use batch processing
+   - Cache results
+
+### Error Messages
+
+- `ValueError: Empty document list`: Ensure documents are properly loaded
+- `AuthenticationError`: Check API keys in .env file
+- `MemoryError`: Reduce chunk size or batch size
    ```
 
 ### Running the Application
@@ -173,20 +327,22 @@ Key methods:
 - `display_qa_results()`: Shows question, answer, and context
 - `plot_metrics_heatmap()`: Visualizes correlation between metrics
 
-### Security Report Viewer
+### Dashboard Components
 
-The Security Report Viewer (`src/ui/security_report_viewer.py`) visualizes security assessment results:
+The Dashboard Components (`src/ui/dashboard_components.py`) provide the main UI elements:
 
-- OWASP LLM security evaluation report
-- Vulnerability details and risk levels
-- Mitigation recommendations
-- Security metrics visualization
+- Control buttons for test generation, answer generation, and metrics calculation
+- Metrics visualization and comparison
+- Security evaluation display
+- QA results presentation
 
 Key methods:
 
-- `load_security_metrics()`: Loads security metrics from output files
-- `display_security_report()`: Shows comprehensive security report
-- `visualize_security_metrics()`: Creates visual representation of security metrics
+- `display_control_buttons()`: Shows control buttons for various operations
+- `display_metrics_summary()`: Displays individual metrics for each response
+- `plot_metrics_comparison()`: Creates visual comparison of metrics
+- `plot_metrics_heatmap()`: Visualizes correlation between metrics
+- `display_qa_results()`: Shows question, answer, and context
 
 ## Utilities
 
@@ -194,10 +350,10 @@ Key methods:
 
 The Data Processor (`src/utils/data_processor.py`) provides utilities for data processing:
 
-- Knowledge base creation
+- Document loading and preprocessing
 - Test question generation
+- Knowledge base creation
 - Text similarity calculation
-- Context metrics calculation
 - Faithfulness evaluation
 
 Key methods:
